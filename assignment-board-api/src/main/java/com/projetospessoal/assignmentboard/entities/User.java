@@ -1,4 +1,4 @@
-package com.projetospessoal.assignmentboard.Entity;
+package com.projetospessoal.assignmentboard.entities;
 
 public class User {
     
@@ -75,6 +75,6 @@ public class User {
     public void setPicture(String picture) {
         this.picture = picture;
     }
-    
+
 
 }
