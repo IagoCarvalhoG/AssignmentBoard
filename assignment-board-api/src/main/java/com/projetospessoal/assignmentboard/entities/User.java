@@ -10,8 +10,7 @@ public class User {
     private String password;
     private String picture;
 
-    public User(Integer userId, String firstName, String lastName, String username, String email, String password,
-            String picture) {
+    public User(Integer userId, String firstName, String lastName, String username, String email, String password,String picture) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;

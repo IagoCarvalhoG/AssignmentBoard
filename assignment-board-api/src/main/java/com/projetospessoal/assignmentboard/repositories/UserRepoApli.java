@@ -1,12 +1,16 @@
 package com.projetospessoal.assignmentboard.repositories;
 
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.batch.BatchProperties.Jdbc;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
 import org.springframework.stereotype.Repository;
 
 import com.projetospessoal.assignmentboard.entities.User;
@@ -15,8 +19,12 @@ import com.projetospessoal.assignmentboard.exceptions.EtAuthException;
 @Repository
 public class UserRepoApli implements UserRepo {
 
-    private static final String SQL_CREATE = "INSERT INTO DB_USERS(FIRST_NAME, LAST_NAME, USERNAME, PASSWORD,EMAIL)VALUES(NEXTVAL(?, ?, ?, ?, ?))";
+    private static final String SQL_CREATE = "INSERT INTO DB_USER(user_id,FIRST_NAME, LAST_NAME, USERNAME, EMAIL, user_PASSWORD)VALUES(NEXTVAL( 'db_user_seq' ),?, ?, ?, ?, ?)";
 
+    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) AS count FROM DB_USER WHERE EMAIL = ?";
+
+    private static final String SQL_FIND_BY_ID = "SELECT user_id, FIRST_NAME, LAST_NAME, USERNAME, EMAIL, user_PASSWORD " +
+    "FROM DB_USER WHERE USER_ID = ?";
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -24,20 +32,24 @@ public class UserRepoApli implements UserRepo {
     public User create(String firstName, String lastName, String email, String username, String password)
             throws EtAuthException {
         try{
-            GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+            KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection ->{
                 PreparedStatement ps = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(0, firstName);
-                ps.setString(1, lastName);
-                ps.setString(2, email);
+                ps.setString(1, firstName);
+                ps.setString(2, lastName);
                 ps.setString(3, username);
-                ps.setString(4, password);
+                ps.setString(4, email);
+                ps.setString(5, password);
+
+                return ps;
             }, keyHolder);
+            Integer id = (Integer) keyHolder.getKeys().get("user_id");
+            User user = new User(id, firstName, lastName, username, email, password, null);
+            return user;
         } catch(Exception e){
-            throw new EtAuthException("Invalid details. Account not created");
+            // throw new EtAuthException();
+            throw new EtAuthException("Dados invalidos");
         }
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'crate'");
     }
 
     @Override
@@ -48,14 +60,28 @@ public class UserRepoApli implements UserRepo {
 
     @Override
     public Integer getCountByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCountByEmail'");
+        
+        Object[] args={email};
+        int[] argTypes = {JDBCType.VARCHAR.getVendorTypeNumber()};
+        return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, args, argTypes,Integer.class);
     }
 
     @Override
     public User findById(Integer userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Object[] args = {userId};
+        int[] argTypes = {JDBCType.INTEGER.getVendorTypeNumber()};
+        return jdbcTemplate.queryForObject(SQL_FIND_BY_ID,args, argTypes, userRowMapper);
+        
     }
+
+    private RowMapper<User> userRowMapper = ((rs,rowNum)->{
+        return new User(rs.getInt("user_id"),
+        rs.getString("first_name"),
+        rs.getString("last_name"),
+        rs.getString("username"), 
+        rs.getString("email"),
+        rs.getString("user_password"),
+        rs.getString("picture"));
+    });
     
 }

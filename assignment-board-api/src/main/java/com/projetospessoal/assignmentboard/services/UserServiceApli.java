@@ -24,7 +24,7 @@ public class UserServiceApli implements UserService {
     }
 
     @Override
-    public User registerUser(String firstName, String lastName, String username, String password, String email)
+    public User registerUser(String firstName, String lastName, String email, String username, String password )
             throws EtAuthException {
         Pattern pattern = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
         if(email!= null){

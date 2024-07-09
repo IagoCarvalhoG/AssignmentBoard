@@ -7,36 +7,36 @@ alter default privileges grant all on tables to assignmentboard;
 alter default privileges grant all on sequences to assignmentboard;
 
 create table db_user(
-user_id serial primary key,
+user_id integer primary key not null,
 first_name varchar(20) not null,
 last_name varchar(20) not null,
 username varchar(20) not null,
-password text not null,
+user_password text not null,
 email varchar(30) not null,
 picture text
 );
 
 create table db_group(
-group_id serial primary key,
+group_id integer primary key not null,
 group_name varchar(20) not null
 );
 
-create table message(
-message_id serial primary key,
+create table db_message(
+message_id integer primary key not null,
 user_id integer not null,
 group_id integer not null,
 message_text text not null,
 date_sent date not null
 );
 
-alter table message add constraint users_id
+alter table db_message add constraint users_id
 foreign key (user_id) references db_user(user_id);
 
-alter table message add constraint groups_id
+alter table db_message add constraint groups_id
 foreign key (group_id) references db_group(group_id);
 
-create table assignments(
-assignment_id serial primary key,
+create table db_assignments(
+assignment_id integer primary key not null,
 group_id integer not null,
 user_id integer not null,
 assignment_name varchar(20) not null,
@@ -48,20 +48,26 @@ time_finished timestamp
 
 );
 
-alter table assignments add constraint users_id
+alter table db_assignments add constraint users_id
 foreign key (user_id) references db_user(user_id);
 
-alter table assignments add constraint groups_id
+alter table db_assignments add constraint groups_id
 foreign key (group_id) references db_group(group_id);
 
-create table relational(
-relational_id serial primary key,
+create table db_relational(
+relational_id integer primary key not null,
 user_id integer not null,
 group_id integer not null
 );
 
-alter table relational add constraint users_id
+alter table db_relational add constraint users_id
 foreign key (user_id) references db_user(user_id);
 
-alter table relational add constraint groups_id
+alter table db_relational add constraint groups_id
 foreign key (group_id) references db_group(group_id);
+
+create sequence db_user_seq increment 1 start 1;
+create sequence db_group_seq increment 1 start 1;
+create sequence db_message_seq increment 1 start 1;
+create sequence db_assignments_seq increment 1 start 1;
+create sequence db_relational_seq increment 1 start 1;

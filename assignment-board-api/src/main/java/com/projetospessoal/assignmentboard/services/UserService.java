@@ -7,5 +7,5 @@ public interface UserService {
     
     User validateUser(String email, String password) throws EtAuthException;
 
-    User registerUser(String firstName, String lastName, String username, String password, String email) throws EtAuthException;
+    User registerUser(String firstName, String lastName, String email, String username, String password) throws EtAuthException;
 }
