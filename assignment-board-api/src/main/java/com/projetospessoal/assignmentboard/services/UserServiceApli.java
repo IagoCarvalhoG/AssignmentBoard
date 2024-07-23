@@ -19,8 +19,11 @@ public class UserServiceApli implements UserService {
 
     @Override
     public User validateUser(String email, String password) throws EtAuthException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validateUser'");
+        if(email != null){
+            email = email.toLowerCase();
+        }
+        User user = userRepo.findByEmailAndPassword(email, password);
+        return user;
     }
 
     @Override

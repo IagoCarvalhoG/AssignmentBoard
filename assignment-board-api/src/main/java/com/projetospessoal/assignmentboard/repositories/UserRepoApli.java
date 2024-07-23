@@ -4,8 +4,9 @@ import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -25,12 +26,18 @@ public class UserRepoApli implements UserRepo {
 
     private static final String SQL_FIND_BY_ID = "SELECT user_id, FIRST_NAME, LAST_NAME, USERNAME, EMAIL, user_PASSWORD " +
     "FROM DB_USER WHERE USER_ID = ?";
+
+    private static final String SQL_FIND_BY_EMAIL = "SELECT user_id, FIRST_NAME, LAST_NAME, USERNAME, EMAIL, user_PASSWORD, PICTURE " +
+    "FROM DB_USER WHERE EMAIL = ?";
+
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     @Override
     public User create(String firstName, String lastName, String email, String username, String password)
             throws EtAuthException {
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(10));
+
         try{
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection ->{
@@ -39,7 +46,7 @@ public class UserRepoApli implements UserRepo {
                 ps.setString(2, lastName);
                 ps.setString(3, username);
                 ps.setString(4, email);
-                ps.setString(5, password);
+                ps.setString(5, hashedPassword);
 
                 return ps;
             }, keyHolder);
@@ -54,8 +61,17 @@ public class UserRepoApli implements UserRepo {
 
     @Override
     public User findByEmailAndPassword(String email, String password) throws EtAuthException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByEmailAndPassword'");
+        try{
+            Object[] args={email};
+            int[] argTypes = {JDBCType.VARCHAR.getVendorTypeNumber()};
+            User user = jdbcTemplate.queryForObject(SQL_FIND_BY_EMAIL, args,argTypes , userRowMapper);
+            if(!BCrypt.checkpw(password, user.getPassword())){
+                throw new EtAuthException("email or password does not exist");
+            }
+            return user;
+        }catch(EmptyResultDataAccessException e){
+            throw new EtAuthException("email or password does not exist");
+        }
     }
 
     @Override
