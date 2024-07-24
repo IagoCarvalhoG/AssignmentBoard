@@ -1,5 +1,6 @@
 package com.projetospessoal.assignmentboard.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,8 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projetospessoal.assignmentboard.Constants;
 import com.projetospessoal.assignmentboard.entities.User;
 import com.projetospessoal.assignmentboard.services.UserService;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,9 +31,7 @@ public class UserController {
         String email = (String) userMap.get("email");
         String password = (String) userMap.get("user_password");
         User user = userService.validateUser(email, password);
-        Map<String, String> map = new HashMap<>();
-        map.put("message", "you are logged in");
-        return new ResponseEntity<>(map,HttpStatus.OK);
+        return new ResponseEntity<>(generateJWTToken(user),HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -40,8 +43,22 @@ public class UserController {
         String password = (String) userMap.get("user_password");
         String username = (String) userMap.get("username");
         User user = userService.registerUser(firstName, lastName, email,username, password);
-        Map<String,String> map = new HashMap<>();
-        map.put("message", "registered succesfully");
-        return new ResponseEntity<>(map,HttpStatus.OK);
+        return new ResponseEntity<>(generateJWTToken(user),HttpStatus.OK);
+    }
+
+    private Map<String, String> generateJWTToken(User user){
+        long currentTime = System.currentTimeMillis();
+        String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, Constants.API_SECRET_KEY)
+        .setIssuedAt(new Date(currentTime))
+        .setExpiration(new Date(currentTime + Constants.TOKEN_VALIDITY))
+        .claim("userId", user.getUserId())
+        .claim("email", user.getEmail())
+        .claim("firstName", user.getFirstName())
+        .claim("lastName", user.getLastName())
+        .claim("picture", user.getPicture())
+        .compact();
+        Map<String, String> map = new HashMap<>();
+        map.put("token", token);
+        return map;
     }
 }
