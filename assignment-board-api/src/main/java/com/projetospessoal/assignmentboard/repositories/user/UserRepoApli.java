@@ -1,4 +1,4 @@
-package com.projetospessoal.assignmentboard.repositories;
+package com.projetospessoal.assignmentboard.repositories.user;
 
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;

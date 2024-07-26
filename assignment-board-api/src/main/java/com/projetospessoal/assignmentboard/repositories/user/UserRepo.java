@@ -1,4 +1,4 @@
-package com.projetospessoal.assignmentboard.repositories;
+package com.projetospessoal.assignmentboard.repositories.user;
 
 import com.projetospessoal.assignmentboard.entities.User;
 import com.projetospessoal.assignmentboard.exceptions.EtAuthException;

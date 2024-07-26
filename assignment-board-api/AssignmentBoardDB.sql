@@ -38,18 +38,13 @@ foreign key (group_id) references db_group(group_id);
 create table db_assignments(
 assignment_id integer primary key not null,
 group_id integer not null,
-user_id integer not null,
 assignment_name varchar(20) not null,
 assignment_description text,
 finished boolean not null,
 deadline date not null,
-assignment_period integer,
 time_finished timestamp
 
 );
-
-alter table db_assignments add constraint users_id
-foreign key (user_id) references db_user(user_id);
 
 alter table db_assignments add constraint groups_id
 foreign key (group_id) references db_group(group_id);

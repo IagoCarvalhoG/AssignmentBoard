@@ -1,4 +1,4 @@
-package com.projetospessoal.assignmentboard.services;
+package com.projetospessoal.assignmentboard.services.user;
 
 import java.util.regex.Pattern;
 
@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.projetospessoal.assignmentboard.entities.User;
 import com.projetospessoal.assignmentboard.exceptions.EtAuthException;
-import com.projetospessoal.assignmentboard.repositories.UserRepo;
+import com.projetospessoal.assignmentboard.repositories.user.UserRepo;
 
 @Service
 @Transactional

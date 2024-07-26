@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projetospessoal.assignmentboard.Constants;
 import com.projetospessoal.assignmentboard.entities.User;
-import com.projetospessoal.assignmentboard.services.UserService;
+import com.projetospessoal.assignmentboard.services.user.UserService;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
